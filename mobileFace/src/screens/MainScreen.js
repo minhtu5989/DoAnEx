@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { FaceDetector,Camera,Permissions,Constants } from 'expo';
+import { Box, Text } from 'react-native-design-utility'
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
-const detect = '/detect[?returnFaceId][&returnFaceLandmarks][&returnFaceAttributes][&recognitionModel][&returnRecognitionModel]'
-
-export class Main extends React.Component {
+export class MainScreen extends React.Component {
   state = {
       hasCameraPermission:null,
       faces : []
@@ -25,7 +25,7 @@ export class Main extends React.Component {
       return <Text>No access to camera</Text>;
     } else {
       return (
-        <View style={styles.container}>
+        <Box center f={1} >
           <Camera
              style={styles.camera}
              type={'front'}
@@ -35,15 +35,15 @@ export class Main extends React.Component {
                detectLandmarks: FaceDetector.Constants.Mode.none,
                runClassifications: FaceDetector.Constants.Mode.none,
              }}>
-              <View style={styles.topBar}>
+              <Box style={styles.topBar}>
                 <Text style={styles.textcolor}>x: {this.state.faces.length ? this.state.faces[0].bounds.origin.x.toFixed(0) : 0}</Text>
                 <Text style={styles.textcolor}>y: {this.state.faces.length ? this.state.faces[0].bounds.origin.y.toFixed(0) : 0}</Text>
-              </View>
-              <View style={styles.bottomBar}>
+              </Box>
+              <Box style={styles.bottomBar}>
                 <Text style={styles.textcolor}>Heigth: {this.state.faces.length ? this.state.faces[0].bounds.size.height.toFixed(0) : 0}</Text>
                 <Text style={styles.textcolor}>width: {this.state.faces.length ? this.state.faces[0].bounds.size.width.toFixed(0) : 0}</Text>
-              </View>
-              <View style={{justifyContent: 'flex-end', flexDirection: 'row', padding: 5}}>
+              </Box>
+              <Box style={{justifyContent: 'flex-end', flexDirection: 'row', padding: 5}}>
                 <TouchableOpacity
                     style={{
                         flex: 1,
@@ -72,11 +72,11 @@ export class Main extends React.Component {
                         {' '}Nhận dạng{' '}
                     </Text>
                 </TouchableOpacity>
-              </View>
+              </Box>
              </Camera>
              { this.state.faces.length ? this.renderFaces() : undefined}
            
-        </View>
+        </Box>
       );
     }
   }
@@ -101,14 +101,14 @@ export class Main extends React.Component {
 };
 
   renderFaces = () => (
-    <View style={styles.facesContainer} pointerEvents="none">
+    <Box style={styles.facesContainer} pointerEvents="none">
       {this.state.faces.map(this.renderFace)}
-    </View>
+    </Box>
   )
 
   renderFace({ bounds, faceID, rollAngle, yawAngle }) {
       return (
-        <View
+        <Box
           key={faceID}
           transform={[
             { perspective: 600 },
@@ -129,7 +129,7 @@ export class Main extends React.Component {
           }
           <Text style={styles.faceText}>rollAngle: {rollAngle.toFixed(0)}</Text>
           <Text style={styles.faceText}>yawAngle: {yawAngle.toFixed(0)}</Text>
-      </View>
+      </Box>
     );
   }
   
@@ -177,11 +177,15 @@ export class Main extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '90%',
+    height: '90%',
     backgroundColor: '#000',
   },
   camera: {
     flex: 1,
     justifyContent: 'space-between',
+    width:wp('100%'),
+    height: hp('100%')
   },
   topBar: {
     flex: 0.2,
