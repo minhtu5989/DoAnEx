@@ -1,1 +1,1 @@
-export { default as AddressRoutes } from './face.routes';
+export { default as FaceRoutes } from './face.routes';

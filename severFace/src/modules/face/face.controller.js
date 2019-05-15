@@ -1,76 +1,76 @@
-// Sử dụng thư viện
-var request = require('sync-request');
+import * as Yup from 'yup';
 
-// Lấy danh sách idol từ file filtered-idols.json
-var idols = require('./filtered-idols.json');
+import * as AddressServices from './address';
 
-let key = '91bc85*******'; // Thay thế bằng key của bạn
-let groupId = 'vav-idols';
+export const create = async (req, res) => {
+  const { data } = req.body;
 
-// NodeJS không có thread.sleep nên ra dùng tạm function này
-function sleep(time) {
-    console.log('Begin Sleep');
-    var stop = new Date().getTime();
-    while(new Date().getTime() < stop + time) {
-        ;
-    }
-    console.log('End Sleep');
-}
+  const schema = Yup.object().shape({
+    street: Yup.string().required(),
+    aptNum: Yup.string(),
+    postalCode: Yup.string()
+      .min(6)
+      .required(),
+    city: Yup.string().required(),
+    province: Yup.string().required(),
+    instructions: Yup.string(),
+    geo: Yup.object().shape({
+      lng: Yup.number().required(),
+      lat: Yup.number().required(),
+    }),
+  });
 
-// Tạo idol trên hệ thống
-function submitIdol(idol) {
-    let url = `https://api.projectoxford.ai/face/v1.0/persongroups/${groupId}/persons`;
-    console.log(`Begin submit idol: ${idol.id} - ${idol.name}`);
-    var res = request('POST', url, {
-        headers: {
-            'Ocp-Apim-Subscription-Key': key
-        },
-        json: {
-            name: idol.name,
-            userData: idol.id
-        }
+  try {
+    await schema.validate(data);
+
+    const address = await AddressServices.createAddress({
+      ...data,
+      postalCode: data.postalCode.replace(/\s/g, ''),
+      user: req.user._id,
     });
 
-    if (res.statusCode == 200) {
-        var person = JSON.parse(res.getBody('utf8'));
+    res.status(201).json({ address });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
-        console.log(`SUCCESS - Submit idol ${idol.id} - ${idol.name}. Person ID: ${person.personId}`);
+export const userAddresses = async (req, res) => {
+  try {
+    const addresses = await AddressServices.getUserAddresses(req.user._id);
 
-        // Bỏ 4 ảnh đầu
-        for (let i = 4; i < idol.images.length; i++) {
-            // Submit ảnh của idol lên hệ thống
-            try {
-                submitIdolFace(person.personId, idol.images[i].image);
-                sleep(4*1000); // Sleep 4 giây vì limit 20 call/phút
-            } catch (err) {
-                console.log('ERROR');
-                console.log(err);
-            }
-        }
-    } else {
-        console.log(res.getBody('utf8'));
+    res.status(200).json({ addresses });
+  } catch (error) {
+    console.log('error', error);
+    throw error;
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    if (!req.body.data) {
+      return res.sendStatus(400);
     }
 
-}
+    const address = await AddressServices.updateAddress(
+      req.params.id,
+      req.body.data,
+      req.user._id,
+    );
 
-// Submit ảnh của idol lên hệ thống
-function submitIdolFace(personId, faceUrl) {
-    console.log(`Begin submit image ${faceUrl.substring(20,60)} for person id ${personId}`);
-    let url = `https://api.projectoxford.ai/face/v1.0/persongroups/${groupId}/persons/${personId}/persistedFaces`;
-    var res = request('POST', url, {
-        headers: {
-            'Ocp-Apim-Subscription-Key': key
-        },
-        json: {
-            url: faceUrl
-        }
-    });
+    res.status(200).json({ address });
+  } catch (error) {
+    console.log('error', error);
+    throw error;
+  }
+};
 
-    if (res.statusCode == 200) {
-        console.log(`SUCCESS - Submit image ${faceUrl.substring(20,60)} for person id ${personId}.`);
-    }
-}
+export const deleteAddress = async (req, res) => {
+  try {
+    await AddressServices.deleteAddress(req.params.id, req.user._id);
 
-for (let idol of idols) {
-    submitIdol(idol);
-}
+    res.sendStatus(204);
+  } catch (error) {
+    throw error;
+  }
+};

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
+import { Box } from 'react-native-design-utility'
 
 export class MyButton extends Component {
     getAdditionalStyle(){
@@ -42,7 +43,9 @@ export class MyButton extends Component {
                     style={[ additionalStyle, _style ]} 
                     disabled={disabled}
                 >
+                    <Box center f={1}>
                         {children}
+                    </Box>
                 </TouchableOpacity>
         )
     }

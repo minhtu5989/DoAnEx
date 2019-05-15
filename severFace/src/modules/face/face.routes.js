@@ -1,12 +1,12 @@
 import { Router } from 'express';
 
-import {
-  create,
-  userAddresses,
-  update,
-  deleteAddress,
-} from './face.controller';
-import { customerAuth } from '../customer';
+// import {
+//   create,
+//   userAddresses,
+//   update,
+//   deleteAddress,
+// } from './face.controller';
+// import { customerAuth } from '../customer';
 
 const routes = Router();
 

@@ -4,7 +4,9 @@ import { FaceDetector,Camera,Permissions,Constants } from 'expo';
 import { Box, Text } from 'react-native-design-utility'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
-export class MainScreen extends React.Component {
+import { api } from "@api/ApiConfig";
+
+export class CameraScreen extends React.Component {
   state = {
       hasCameraPermission:null,
       faces : []
@@ -66,7 +68,7 @@ export class MainScreen extends React.Component {
                         justifyContent: 'flex-end',
                         alignItems: 'center',
                     }}
-                    onPress={() => this.snap(true)}>
+                    onPress={this.handelEnroll} >
                     <Text
                         style={{ fontSize: 18, marginBottom: 10, color: 'black' }}>
                         {' '}Nhận dạng{' '}
@@ -81,24 +83,38 @@ export class MainScreen extends React.Component {
     }
   }
 
-  snap = async (recognize) => {
-    try {
-        if (this.camera) {
-            let photo = await this.camera.takePictureAsync({ base64: true });
-            if(!faceDetected) {
-                alert('Không có khuôn mặt nào !');
-                return;
-            }
-            
-            const userId = makeId();
-            const { base64 } = photo;
+  handelEnroll = async() => {
+    let res = await api.Detect
+          .url('/largepersongroups/tu-luong-marchine-learning/training')
+          .headers({ "Ocp-Apim-Subscription-Key": "4f12445ce8f84307897b1673854ed6b1" })
+          .get()
+          .json();
 
-            this[recognize ? 'recognize' : 'enroll']({ userId, base64 });
-        }
-    } catch (e) {
-        console.log('error on snap: ', e)
-    }
-};
+          console.log(res);
+          
+    try {
+      if (this.camera) {
+          let photo = await this.camera.takePictureAsync({ base64: true });
+
+          console.log('abc');
+
+          if(!faceDetected) {
+              console.log('Không có khuôn mặt nào !');
+              return;
+          }
+          const userId = makeId();
+          const { base64 } = photo;
+          console.log('base64: ', base64 );
+          console.log('photo: ', photo );
+          console.log('userId: ', userId );
+
+          
+
+      }
+  } catch (e) {
+      console.log('error on snap: ', e)
+  }
+}
 
   renderFaces = () => (
     <Box style={styles.facesContainer} pointerEvents="none">

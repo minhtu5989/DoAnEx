@@ -4,6 +4,7 @@ import middlewaresConfig from './config/middlewares';
 import './config/db';
 
 // import { CustomerRoutes, AddressRoutes } from './modules';
+import { FaceRoutes } from './modules';
 
 const app = express();
 
@@ -14,7 +15,8 @@ app.get('/', (req, res) => {
 });
 
 // app.use('/api/v1/customers', CustomerRoutes);
-// app.use('/api/v1/addresses', AddressRoutes);
+
+app.use('/api/v1/face', FaceRoutes);
 
 app.listen(3000, err => {
   if (err) {
