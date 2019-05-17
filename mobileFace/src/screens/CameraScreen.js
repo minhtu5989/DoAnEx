@@ -3,12 +3,14 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 import { FaceDetector,Camera,Permissions,Constants } from 'expo';
 import { Box, Text } from 'react-native-design-utility'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { api } from "@api/ApiConfig";
 
 export class CameraScreen extends React.Component {
   state = {
       hasCameraPermission:null,
+      type: Camera.Constants.Type.front,
       faces : []
     }
 
@@ -30,7 +32,7 @@ export class CameraScreen extends React.Component {
         <Box center f={1} >
           <Camera
              style={styles.camera}
-             type={'front'}
+             type={this.state.type}
              onFacesDetected={this.handleFacesDetected}
              faceDetectorSettings={{
                mode: FaceDetector.Constants.Mode.fast,
@@ -45,6 +47,34 @@ export class CameraScreen extends React.Component {
                 <Text style={styles.textcolor}>Heigth: {this.state.faces.length ? this.state.faces[0].bounds.size.height.toFixed(0) : 0}</Text>
                 <Text style={styles.textcolor}>width: {this.state.faces.length ? this.state.faces[0].bounds.size.width.toFixed(0) : 0}</Text>
               </Box>
+
+              {/* change 'back' or front camera */}
+              <Box
+                style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  flexDirection: 'row',
+                  justifyContent:'flex-end',
+                  marginRight: 15
+                }}>
+                <TouchableOpacity
+                  style={{
+                    flex: 0.1,
+                    alignSelf: 'flex-end',
+                    // alignItems: 'center',
+                  }}
+                  onPress={() => {
+                    this.setState({
+                      type: this.state.type === Camera.Constants.Type.back
+                        ? Camera.Constants.Type.front
+                        : Camera.Constants.Type.back,
+                    });
+                  }}>
+                    <MaterialCommunityIcons name="camera-party-mode" color="white" size={40} />
+                </TouchableOpacity>
+              </Box>
+
+              {/* btn Enroll & Recognize */}
               <Box style={{justifyContent: 'flex-end', flexDirection: 'row', padding: 5}}>
                 <TouchableOpacity
                     style={{
@@ -54,7 +84,7 @@ export class CameraScreen extends React.Component {
                         justifyContent: 'flex-end',
                         alignItems: 'center',
                     }}
-                    onPress={() => this.snap(false)}>
+                    onPress={this.handle}>
                     <Text
                         style={{ fontSize: 18, marginBottom: 10, color: 'black' }}>
                         {' '}Nạp ảnh{' '}
@@ -68,7 +98,7 @@ export class CameraScreen extends React.Component {
                         justifyContent: 'flex-end',
                         alignItems: 'center',
                     }}
-                    onPress={this.handelEnroll} >
+                    onPress={() => this.snap(true)}>
                     <Text
                         style={{ fontSize: 18, marginBottom: 10, color: 'black' }}>
                         {' '}Nhận dạng{' '}
@@ -83,38 +113,93 @@ export class CameraScreen extends React.Component {
     }
   }
 
-  handelEnroll = async() => {
-    let res = await api.Detect
-          .url('/largepersongroups/tu-luong-marchine-learning/training')
-          .headers({ "Ocp-Apim-Subscription-Key": "4f12445ce8f84307897b1673854ed6b1" })
-          .get()
-          .json();
+  handle = async() => {
+    
 
-          console.log(res);
-          
     try {
       if (this.camera) {
           let photo = await this.camera.takePictureAsync({ base64: true });
-
-          console.log('abc');
-
           if(!faceDetected) {
-              console.log('Không có khuôn mặt nào !');
+              alert('No face detected!');
               return;
           }
+          let res1 = await api.StatusTranning
+          .url('/tu-luong-marchine-learning/training')
+          .headers({ "Ocp-Apim-Subscription-Key": `${api.keyApi}` })
+          .get()
+          .json();
+
+          console.log('res1111:', res1);
+          // let res2 = await api.Detect
+          // .url('?returnFaceId=true&returnFaceAttributes=age,gender,smile,emotion,makeup,accessories,exposure&recognitionModel=recognition_02&returnRecognitionModel=true')
+          // .headers({ 
+          //   "Ocp-Apim-Subscription-Key": `${api.keyApi}`,
+          //   "Content-Type": "application/octet-stream"
+          // })
+          // .post(
+          //     `${api.base64}`
+          // )
+          // .json();
+
+          // console.log('res2:', res2);
+
           const userId = makeId();
-          const { base64 } = photo;
-          console.log('base64: ', base64 );
-          console.log('photo: ', photo );
-          console.log('userId: ', userId );
-
+          const { base64, uri } = photo;
+          console.log('photo: ', photo);
+          console.log('base64: ', base64);
+          console.log('uri: ', uri);
           
-
+          this[recognize ? 'recognize' : 'enroll']({ userId, base64 });
       }
   } catch (e) {
       console.log('error on snap: ', e)
   }
-}
+  }
+
+
+  snap = async (recognize) => {
+
+    let res1 = await api.StatusTranning
+    .url('/tu-luong-marchine-learning/training')
+    .headers({ "Ocp-Apim-Subscription-Key": `${api.keyApi}` })
+    .get()
+    .json();
+
+    console.log('res1:', res1);
+
+    
+    
+    // try {
+        // if (this.camera) {
+            let photo = await this.camera.takePictureAsync({ base64: true });
+            if(!faceDetected) {
+                alert('No face detected!');
+                return;
+            }
+            // let res2 = await api.Detect
+            // .url('?returnFaceId=true&returnFaceAttributes=age,gender,smile,emotion,makeup,accessories,exposure&recognitionModel=recognition_02&returnRecognitionModel=true')
+            // .headers({ 
+            //   "Ocp-Apim-Subscription-Key": `${api.keyApi}`,
+            //   "Content-Type": "application/octet-stream"
+            // })
+            // .post(
+            //     `${api.base64}`
+            // )
+            // .json();
+
+            console.log('res2:', res2);
+
+            const userId = makeId();
+            const { base64 } = photo;
+            console.log('photo: ', photo);
+            console.log('base64: ', base64);
+            
+            // this[recognize ? 'recognize' : 'enroll']({ userId, base64 });
+        // }
+    // } catch (e) {
+    //     console.log('error on snap: ', e)
+    // }
+};
 
   renderFaces = () => (
     <Box style={styles.facesContainer} pointerEvents="none">
@@ -154,39 +239,6 @@ export class CameraScreen extends React.Component {
       this.setState({ faces });
     }
   };
-
-
-  //các method post API
-
-  //const BASE_URL = 'https://westcentralus.api.cognitive.microsoft.com/face/v1.0';
-  //const keyApi = 'f2b141059c814519b488dbabd5169e4b'
-  //   //Enroll Method
-  //   const enroll = async ({userId, base64}) => {
-  //     const rawResponse = await fetch(`${BASE_URL}enroll`, {
-  //         method: 'POST',
-  //         headers: HEADERS,
-  //         body: JSON.stringify({
-  //             "image": base64,
-  //             "subject_id": `MySocial_${userId}`,
-  //             "gallery_name": "MyGallery"
-  //         })
-  //     });
-  //     const content = await rawResponse.json();
-  //     return content;
-  //   }
-  //   //Recognize Method
-  //   const recognize = async (base64) => {
-  //     const rawResponse = await fetch(`${BASE_URL}recognize`, {
-  //         method: 'POST',
-  //         headers: HEADERS,
-  //         body: JSON.stringify({
-  //             "image": base64,
-  //             "gallery_name": "MyGallery"
-  //         })
-  //     });
-  //     const content = await rawResponse.json();
-  //     return content;
-  //   }
 
 }
 

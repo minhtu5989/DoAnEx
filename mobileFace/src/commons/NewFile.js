@@ -28,6 +28,7 @@ export class NewFile extends Component {
         return (
             <Box f={1} bg={theme.blueLight}>
                 <Text>this is NewFile</Text>
+                <EvilIcons name="user" color="white" size={35} />
             </Box>
         );
     }

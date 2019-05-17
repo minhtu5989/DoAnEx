@@ -1,12 +1,12 @@
 import React from 'react';
 import { UtilityThemeProvider, Box, Text } from 'react-native-design-utility';
 import { ActivityIndicator, SafeAreaView, StatusBar } from 'react-native';
-import { NavigationService } from './src/api/NavigationService';
+import { NavigationService } from '@utils/NavigationService';
 // import { Provider, } from 'mobx-react/native';
 
-import { images } from './src/constants/images';
-import { cacheImages } from './src/utils/cacheImages'
-import { theme } from './src/constants/theme'
+import { images } from '@constants/images';
+import { cacheImages } from '@utils/cacheImages'
+import { theme } from '@constants/theme'
 // import { store } from './src/stores';
 
 // import AppNav from "./src/screens/index";
@@ -40,9 +40,9 @@ export default class App extends React.Component {
       // <Provider {...store}>
         <UtilityThemeProvider theme={theme}>
           <SafeAreaView style={{flex:1, backgroundColor: theme.color.white}}>
-            <StatusBar barStyle='dark-content'/>
             <Box center f={1}>
-                <AppNav ref={ r => NavigationService.setTopLevelNavigator(r) }/>
+              <StatusBar barStyle='dark-content'/>
+              <AppNav ref={ r => NavigationService.setTopLevelNavigator(r) }/>
             </Box>
           </SafeAreaView>
         </UtilityThemeProvider>
