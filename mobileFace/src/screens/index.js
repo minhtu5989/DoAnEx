@@ -1,17 +1,26 @@
 import { createSwitchNavigator, createAppContainer } from 'react-navigation'
 
 import { CameraScreen } from "./CameraScreen";
-import { Home } from "./Home";
+import { ExampleScreen } from "./ExampleScreen";
+import { HomeScreen } from "./HomeScreen";
+import { testCam } from "./testCam";
+
 const AppNavigator = createSwitchNavigator(
     {
         HomeScreen: {
-            screen : Home
+            screen : HomeScreen
         },
         CameraScreen: {
             screen : CameraScreen
         },
+        ExampleScreen: {
+            screen : ExampleScreen
+        },
+        testCam: {
+            screen : testCam
+        },
     },{
-        initialRouteName: 'HomeScreen'
+        initialRouteName: 'testCam'
     }
 )
 

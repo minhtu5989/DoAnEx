@@ -15,6 +15,8 @@
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
     "react-native-design-utility": "0.0.30",
+    "react-native-image-picker": "0.26.2",
+    "react-native-modalbox": "^1.7.1",
     "react-native-responsive-screen": "^1.2.2",
     "react-navigation": "^3.6.1",
     "wretch": "^1.5.2",

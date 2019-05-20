@@ -19,7 +19,7 @@ import { api } from '@api/ApiConfig';
 // import { inject, observer } from 'mobx-react/native';
 
 
-export class Home extends Component {
+export class HomeScreen extends Component {
     constructor(props) {
         super(props);
         this.state = { 
