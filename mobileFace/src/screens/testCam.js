@@ -2,6 +2,7 @@ import {ImagePicker, Permissions, Expo, PixelRatio} from 'expo';
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, CameraRoll, Platform } from 'react-native';
 
+import wretch from 'wretch';
 export class testCam extends React.Component {
   state = {
     imgUri: '',
@@ -57,11 +58,29 @@ export class testCam extends React.Component {
             <Text style={styles.buttonText}>Lưu ảnh</Text>
           </TouchableOpacity>
           
+          <TouchableOpacity
+            style={[styles.button, {backgroundColor: 'blue'}]}
+            onPress={this._Btn}>
+            <Text style={styles.buttonText}>Btn</Text>
+          </TouchableOpacity>
+
         </View>
       </View>
     );
   }
   
+  _Btn = async () => {
+    try{
+      res = await wretch('http://172.17.0.57:3500')
+      .url('/tkbHutech')
+      .get()
+      .json()
+
+      console.log('res: ', res);
+    } catch (error) {
+      throw error;
+    }
+  }
   
   _onChoosePic = async () => {
     const {
