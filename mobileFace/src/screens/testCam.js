@@ -3,18 +3,41 @@ import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, CameraRoll, Platform } from 'react-native';
 
 import wretch from 'wretch';
+
+import { Constants, Calendar } from 'expo';
+import { Button } from 'react-native-elements';
+
 export class testCam extends React.Component {
   state = {
     imgUri: '',
     topText: '',
     bottomText: '',
+    results: []  
   }
 
   componentWillMount = async() => {
     const { status } =await Permissions.askAsync(Permissions.CAMERA);
     this.setState({hasCameraPermission:status==='granted'});
     this.askPermission()
+    this.myCalendar()
  }
+
+ myCalendar() {
+  let details = {
+    title: 'myCalendar',
+    color: 'blue',
+    entityType: Calendar.EntityTypes.REMINDER,
+    sourceId: 'my_calendar_1'
+  };
+  
+  Calendar.createCalendarAsync(details)
+    .then( event => {
+      this.setState({ results: event });
+    })
+    .catch( error => {
+      this.setState({ results: error });
+    });
+}
 
  askPermission = async () => {
     // only if user allows permission to camera roll
@@ -38,36 +61,48 @@ export class testCam extends React.Component {
           source={{ uri: this.state.imgUri }}
         />
         
-        <View style={{ flexDirection: 'column', flex: 1, width: '100%' }}>
-        
+        <View style={{ flexDirection: 'row', flex: 1, width: '100%' }}>
           <TouchableOpacity
             style={[styles.button, {backgroundColor: 'lightblue'}]}
             onPress={this._onChoosePic}>
             <Text style={styles.buttonText}>Chọn ảnh</Text>
           </TouchableOpacity> 
-
           <TouchableOpacity
             style={[styles.button, {backgroundColor: 'yellow'}]}
             onPress={this._onTakePic}>
             <Text style={styles.buttonText}>Chụp ảnh</Text>
           </TouchableOpacity>
+        </View>
           
+        <View style={{ flexDirection: 'row', flex: 1, width: '100%' }}>
           <TouchableOpacity
             style={[styles.button, {backgroundColor: 'green'}]}
             onPress={this._onSave}>
             <Text style={styles.buttonText}>Lưu ảnh</Text>
           </TouchableOpacity>
-          
           <TouchableOpacity
             style={[styles.button, {backgroundColor: 'blue'}]}
             onPress={this._Btn}>
-            <Text style={styles.buttonText}>Btn</Text>
+            <Text style={styles.buttonText}>Test API</Text>
           </TouchableOpacity>
-
         </View>
+
+        <View style={{ flexDirection: 'row', flex: 1, width: '100%' }}>
+          <View style={styles.container}>
+            <Button
+              title="Make a Calendar"
+              onPress={() => this.myCalendar()}
+              buttonStyle={{ backgroundColor: '#d00001' }}
+            />
+              <Text style={{ marginTop: 20 }}>{this.state.results.toString()}</Text>
+          </View>
+        </View>
+
       </View>
     );
   }
+
+  
   
   _Btn = async () => {
     try{
@@ -128,6 +163,13 @@ export class testCam extends React.Component {
 
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: Constants.statusBarHeight,
+    backgroundColor: '#ecf0f1',
+  },
   text: {
     fontSize: 28,
     margin: 20,

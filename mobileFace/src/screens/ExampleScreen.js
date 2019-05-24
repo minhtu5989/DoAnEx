@@ -3,16 +3,15 @@ import {
     StyleSheet, 
     Picker
 } from 'react-native';
-
 import { Box, Text } from 'react-native-design-utility'
-
 import { theme } from '@constants/theme';
-import { MyButton } from '@commons/MyButton';
 // import { NavigationService } from '@api/NavigationService';
 import { EvilIcons } from '@expo/vector-icons';
 import Modal from 'react-native-modalbox';
+import {Calendar} from 'react-native-calendars';
 
 import { Detector } from "../components/Detector";
+import { MyButton } from '@commons/MyButton';
 
 const imagePickerOptions = {
     title: 'Chọn ảnh', 
@@ -47,9 +46,8 @@ export class ExampleScreen extends Component {
     render() {
         return (
             <Box f={1} w={'100%'} h={'100%'} bg={theme.blueLight} center>
-                <Text>this is NewFile</Text>
-                <EvilIcons name="user" color={theme.color.myAppColor} size={35} />
-
+                
+                
                 <MyButton onPress={() => this.refs.modal1.open()} style={[styles.btn]} type='success'>
                         <Text> Modal </Text>
                 </MyButton>
